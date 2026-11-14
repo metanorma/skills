@@ -118,6 +118,13 @@ decide success or failure.
   invisible-detail defeats (trailing spaces, shifted capture groups)
   are silent no-ops that produce wrong output with no error.
 
+- **Compile-clean is not publish-clean.** The site pipeline's mnconvert
+  STS step rejects structures the compile accepts: bibliography-styled
+  sections mid-body, preformatted content inside term entries, multiple
+  level-0 titles. Validate against the STS output before delivery, and
+  register only publish-clean documents in the site manifest. See
+  `references/pitfalls.md`.
+
 - **Transcribe the whole document.** Every section of the source appears
   in the output — transcribed, or flagged as out of scope before delivery.
   Unnumbered sections (forewords, appreciations, display boxes) are not

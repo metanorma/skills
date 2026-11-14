@@ -150,6 +150,24 @@ def check_adoc(path):
     check("fences not shifted", not shifted,
           f"---- followed directly by record content at lines {shifted[:4]}")
 
+    # markdown fences are not AsciiDoc; they render as literal text
+    md_fences = [i + 1 for i, l in enumerate(lines) if re.match(r"^```\w*$", l)]
+    check("no markdown fences", not md_fences,
+          f"``` lines render as visible text: {md_fences[:6]}")
+
+    # one level-0 title per document (merged-copy signature)
+    l0 = [i + 1 for i, l in enumerate(lines) if re.match(r"^= \S", l)]
+    check("single level-0 title", len(l0) <= 1,
+          f"{len(l0)} level-0 titles at lines {l0[:6]} — merged document copies")
+
+    # leaked model-refusal text from AI-assisted conversions
+    refusals = [i + 1 for i, l in enumerate(lines)
+                if re.search(r"I (?:can't|cannot|won't) turn this|"
+                             r"I (?:can't|cannot) (?:assist|provide|reproduce)|"
+                             r"I (?:can|will) summarize", l, re.I)]
+    check("no model-refusal text", not refusals,
+          f"leaked AI refusal/summary text at lines {refusals[:6]}")
+
     return text
 
 

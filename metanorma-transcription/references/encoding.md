@@ -34,6 +34,25 @@ A transcribed document carries, as a minimum:
 - A provenance note goes in an AsciiDoc comment above the title
   (`// …`), not as visible body text.
 
+### Site-scale conventions
+
+In a corpus that builds as one site, each document additionally needs:
+
+- Registration in the site manifest (`metanorma.yml`); an unregistered
+  document silently drops out of the site build — and registration
+  newly exposes a document to the publish step (mnconvert STS), where
+  compile-clean encodes can still fail. Register only publish-clean
+  documents and note the rest as pending in manifest comments.
+- A stable directory slot: `sources/<family>/<year>/`, language tier
+  (`en/`, `fr/`) when the edition is multilingual. Year-only names;
+  edition metadata lives in the document header, not the path.
+- No build artifacts under version control: `document.sts.xml`,
+  `document.pdf.fo.xml`, `document.xml.abort` and friends are compile
+  outputs; they are gitignored or removed, never committed.
+- One edition of a document per directory; superseded machine
+  conversions are removed from the tree when their restructured
+  replacement lands (the originals stay outside version control).
+
 ## Headings
 
 - Reconstruct hierarchy from the source's own table of contents when the

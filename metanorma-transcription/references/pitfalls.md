@@ -17,6 +17,36 @@ first things to check when a converted document fails or renders wrong.
 | `Malformed MathML: [plurimath] Failed to parse … type \`asciimath\`` | LaTeX content in a stem paragraph or `[stem]++++` passthrough — the block style selects the parser | `[latexmath]` + `----` blocks for LaTeX, no `\[ \]` delimiters; `[$latexmath]` is a role, not a style |
 | math fails one formula at a time across runs | plurimath aborts on the first unparseable formula; the FATAL list is truncated | convert every formula in one pass; grep the log for "Failed to parse" until zero |
 
+## Publish failures (site pipeline)
+
+A document that compiles clean can still fail the site pipeline's
+mnconvert STS step (Metanorma XML → NISO STS). These cost three red CI
+rounds in one corpus before they were catalogued:
+
+- `bibliography sections do not support nested sections` — a
+  `[bibliography]`-styled section in the body with subsections beneath
+  it (typical of AI monoliths that merged two document copies).
+  Bibliography styling is legal only on the final bibliography and on
+  clause 2; nothing nests beneath either.
+- `Invalid content was found starting with element 'preformat'` in the
+  STS termbase — listing/literal/tabular blocks inside term
+  definitions or term notes. Structured content in clause 3 moves to
+  `[example]` blocks or regular clause content, never inside a term.
+- `Invalid content was found starting with element 'references'` — the
+  same monolith duplication: a `[bibliography]`-styled section sitting
+  mid-body among ordinary clauses.
+- Multiple level-0 titles (`= Title` more than once per document) —
+  merged document copies; the site compiles them into unrecognizable
+  STS. One level-0 title per document, always.
+- **Leaked model-refusal text.** AI-assisted conversions embed their
+  refusals ("I can't turn this into a verbatim transcription…") as
+  document content, often in the front matter of the very chunk they
+  refused. Grep the converted output for refusal phrasing before
+  delivery.
+- **Markdown fences render as literal text.** ` ``` ` and
+  ` ```asciidoc ` lines from pandoc-class dumps are not AsciiDoc
+  fences; they pass through as visible junk. Strip them in cleanup.
+
 ## Rendering failures
 
 - **Document text as source code.** An unpaired `----` literal fence, or
