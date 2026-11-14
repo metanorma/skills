@@ -67,6 +67,18 @@ rounds in one corpus before they were catalogued:
 - **Stale markup remnants.** `[.s12]#` role spans, `++` passthroughs and
   `{plus}` escapes leaking into output text — clean inline before
   delivery.
+- **`****` used as a comment wrapper.** Four asterisks delimit an
+  example block: licence notices and encoding remarks wrapped in them
+  render as visible examples and can suppress the heading that
+  follows. Meta-notes are `//` comments.
+- **Hand-written note and example numbers.** `NOTE 1:` and `EXAMPLE 1:`
+  prefixes double-number after Metanorma auto-numbers them; strip to
+  bare `NOTE:` / `[example]`, and split multi-paragraph notes into
+  `[NOTE]` open blocks.
+- **Publisher "About" boilerplate transcribed.** The BSI/IEC/CENELEC
+  "About the publisher" front-matter sections are furniture — deleted,
+  not transcribed (the auto-injected boilerplate family extends to
+  these).
 
 ## Process failures
 

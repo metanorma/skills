@@ -90,6 +90,16 @@ decide success or failure.
 
 ## The rules that decide success
 
+- **Notes, examples and lists are auto-numbered.** `NOTE 1:` and
+  `EXAMPLE 1:` prefixes double-number after rendering; source lettered
+  items (`a) b) c)`) become arabic `.` lists. Hand-written numbers and
+  letters are always wrong.
+
+- **Cross-reference localities chain as tokens.** Multi-locality
+  references join full `clause=N` tokens with `;and!` / `;to!` —
+  `<<gum6,clause=5.1;and!clause=5.3>>`, never quoted locality lists.
+  See `references/encoding.md`.
+
 - **Math: the block style selects the parser.** LaTeX formulas go in
   `[latexmath]` + `----` open blocks with no `\[ \]` delimiters inside.
   Bare `\[...\]` stem paragraphs and `[stem]++++` passthroughs parse as

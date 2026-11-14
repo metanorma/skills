@@ -8,17 +8,18 @@ A transcribed document carries, as a minimum:
 = Document title
 :title-intro-en: …
 :docnumber: 19104
+:partnumber:
 :edition: 1
 :copyright-year: 2016
-:revdate: 2016-10-01
+:published-date: 2016-10-01
 :language: en
 :doctype: international-standard
 :docstage: 60
 :docsubstage: 60
 :technical-committee: …
+:library-ics: 35.030, 03.040
 :mn-output-extensions: xml,html,doc,pdf,rxl
 :mn-document-class: iso
-:data-uri-image:
 :local-cache-only:
 ```
 
@@ -33,6 +34,19 @@ A transcribed document carries, as a minimum:
 - `:local-cache-only:` avoids network access during validation.
 - A provenance note goes in an AsciiDoc comment above the title
   (`// …`), not as visible body text.
+- Deprecated attributes are removed, not updated: `:data-uri-image:`,
+  `:docfile:` are gone from the toolchain.
+- Multi-part documents split the identifier: `:docnumber: 17021` plus
+  `:partnumber: 1`; publication dates are full ISO dates when the
+  source carries the day.
+- `:library-ics:` is comma-separated (`35.030, 03.040`), never
+  semicolon-separated.
+- A non-default foreword (European foreword, national foreword) needs
+  `[heading=foreword]` on its heading, or the flavor numbers it as a
+  clause.
+- Bare emails become `mailto:addr[]` — the trailing empty `[]` is
+  required. Bare URLs become `link:url[]` (empty text is the settled
+  form).
 
 ### Identifiers, editions and URNs
 
@@ -98,6 +112,11 @@ In a corpus that builds as one site, each document additionally needs:
 - Annex depth caps at 4. ATS-style labels — test purpose, test method,
   reference, test type — become bold-label paragraphs
   (`*Test purpose:* …`), not headings.
+- Annex normativity is an attribute, `[appendix,obligation=normative]` —
+  `subtype=` is not the annex key.
+- `{blank}` is a placeholder for genuinely untitled subclauses only;
+  migrations that blanked real subclause titles must have them
+  restored.
 - Document-title repeats on body pages are dropped; `Foreword`,
   `Introduction` (with `[.introduction]`) and `Bibliography`
   (with `[bibliography]`) are special clauses.
@@ -150,6 +169,37 @@ structured data, not as hand-built output:
 - Amendment rows cite units at sub-clause and lettered-item
   granularity (`A-202.1d`); compound and range citations are lists of
   references, not single values.
+
+## Cross-references and localities
+
+- Multi-locality references chain full locality tokens with `;and!` /
+  `;to!` — never quoted locality lists:
+  `<<gum6,clause=5.1;and!clause=5.3;and!clause=5.8>>`,
+  `<<scls-7-5-1;to!scls-7-5-4>>`, ranges of clauses
+  `<<cls-5;to!cls-10>>`.
+- External-document xrefs carry locality parameters the same way:
+  `<<iso19011,clause=4>>`, `<<iso17000_2004,clause=5.2,note=1>>`,
+  `<<iso_iec_17021_1_2015,annex=A>>`.
+- Term-source citations use `locality:definition=`:
+  `<<iso17000,locality:definition="5.3">>`.
+- Notes referenced from prose get their own anchors: `[[note-7-1-2]]`
+  on the note, `See <<note-7-1-2>>` in the text. List items are
+  anchorable too (`<<scls-9-5-1-2-b>>`).
+- `<<ref15, fn>>` renders the reference as a footnote.
+- `<<annex-a,style=full%>>` renders number plus title.
+- Prose mentions of clauses, annexes and tables become anchored xrefs —
+  add `[[cls-4]]` / `[[annex-a]]` / `[[table-b-1]]` and reference them;
+  an intro list of annexes becomes `* <<annex-a>>: description`.
+- Plain-language citations of other documents ("ISO 19011:2011, Clause
+  4.") are converted, not left as text.
+- Citation labels must carry the true document stage and publisher
+  (`ISO/IEC TS 17021-2`, not `ISO/IEC 17021-2`; `IEC 31010`, not
+  `ISO 31010`).
+- Reviewer annotations (when the corpus records review positions) use
+  paired inline anchors plus an empty styled block:
+  `[[review_1s]]…[[review_1f]]` in the text and
+  `[reviewer=C1,from=review_1s,to=review_1f,type=corrigenda]` on an
+  empty open block.
 
 ## Auto-injected boilerplate
 
@@ -243,10 +293,28 @@ ISO 1087-1, 3.4.1
   renders as a phantom empty figure. Citations inside blocks are
   `[.source]`-styled paragraphs.
 - Sources are `[.source]` blocks; the citation targets a bibliography
-  anchor (`<<IEC_60050_161_1990,clause=161-01-20>>`) rather than a bare
-  string, and the modification marker is part of the content:
-  `…clause=161-01-20>>, modified — the domain has been deleted…`.
-  Dropping "modified" silently changes a term's normative status.
+  anchor with the right locality form —
+  `<<iso17000,locality:definition="5.3">>` for definitions,
+  `<<IEC_60050_161_1990,clause=161-01-20>>` for clauses — not a bare
+  string.
+- Whether the modification marker ("modified — …") is kept is a
+  per-corpus editorial decision: corpora differ (some keep it, some
+  strip it and carry only the modification text). Match the corpus
+  before editing; do not "fix" either direction across corpora.
+- A bibitem cited from a term source must be a real, visible entry —
+  not `[[[anchor,hidden(X)]]]` — and the term source's anchor must
+  match the bibitem anchor exactly (year-less where the bibliography
+  entry is year-less).
+- Bibitem list items carry only the `[[[anchor,id]]]` anchor: relaton
+  fetches and renders the citation — never append `, _Title_` by hand.
+  Anchor ids follow the corpus convention (e.g. `ISO_IEC_6523_1_2023`;
+  non-ISO entries keep their display id: `W3C did-resolution-1.0`).
+- Adapted terms from multilingual sources designate per language with
+  the `lang:` role, not quoting roles: `=== lang:en[paddy]
+  lang:fr[paddy]`.
+- An admitted synonym under the term heading is an `alt:[…]` line as
+  the first line of the entry — no blank line between heading and
+  `alt:`.
 
 ### Concept mentions
 
@@ -262,6 +330,11 @@ related to one concept {{<<term-concept>>,concept}}
 - `{{<<anchor>>,term,rendered text}}` overrides the rendered form.
 - Plain `(<<term-x>>)` parenthesized xrefs are not concept mentions;
   the XML must carry `<concept>` elements.
+- No manual parentheses around a mention — `({{process}})` becomes
+  `{{process}}`; the clause number is never hand-written —
+  `{{proficiency testing item}} (3.8)` drops the `(3.8)`.
+- Plural/inflected forms pass the rendered text:
+  `{{participant,participants}}`, `{{policy, policies}}`.
 - The designations of converted entries (preferred vs admitted
   synonyms) can be recovered from the source PDF by font analysis:
   designations are the wholly-bold lines that follow the bold
@@ -313,7 +386,8 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
   ("dropping cells from incomplete row" aborts the build).
 - Blank lines inside `|===` regions terminate cells — drop them.
 - Table titles become block captions (`. Table title`) above the table,
-  not headings.
+  not headings — numbering is automatic, so no manual "Table 1 — " in
+  the caption.
 - **Two-level grouped headers do not survive `options="header"`.**
   Metanorma emits a single-row `<thead>`, and a row-span crossing the
   thead/tbody boundary fails validation ("rows cannot go outside
@@ -327,6 +401,15 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
   superscript ranges (bit numbers, scale bands) need explicit spans —
   encode the print's merge structure, not its visual approximation,
   and verify the rendered table against the print row by row.
+- Multi-row headers declare `options="header",headerrows=2` where the
+  flavor supports it; otherwise keep grouped header rows in tbody with
+  bold cells (see the grouped-header rule above).
+- Footnotes inside tables use the `footnote:` machinery, not text:
+  `footnote:a[…text…]` defined under the spanned header cell,
+  referenced as `| 1 footnote:a[]` in cells.
+- Paired correspondence rows are joined into one physical row with all
+  cells present — asciidoctor silently DROPS incomplete rows, and a
+  short pair-half lands its cells in the wrong columns with no error.
 
 ## Figures
 
@@ -344,6 +427,23 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
   names, PDF object names) unless the corpus convention says otherwise;
   renumbering images breaks the mapping back to the source.
 
+## Lists
+
+- Source lettered items (`a) … b) …`) become arabic auto-lists (`.`
+  items) — the letters are never hand-written, and continuation lines
+  are dedented (flush with the item text).
+- Sub-items nest with `..`; an intro item with a bold lead becomes
+  `. *Term*: definition` with `..` children.
+- Source bullet glyphs (—, •) are list markers, not text: `— EN
+  18239…` becomes `* EN 18239…`.
+- Footnote-style citations ("HTTPfootnote:[RFC 7540, …]") become
+  bibliography xrefs: a bibitem plus `HTTP <<RFC7540>>`.
+- `****` is an example-block delimiter — text wrapped in it renders as
+  a visible example and can suppress the following heading. Meta-notes
+  (licence notices, encoding remarks) are `//` comments.
+- A two-column bilingual foreword (national-language | English) is an
+  `[%unnumbered,cols="<.<50,<.<50",options="header"]` table.
+
 ## Inline cleanup
 
 - Remove: bookmark wrappers (`[#bookmark12]##‌##…`), zero-width
@@ -353,6 +453,20 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
   price lines), and page furniture.
 - UML stereotypes become guillemets: `«interface»`, `«enumeration»`.
   Double angle brackets parse as cross-reference macros.
+- The source is ASCII-only unless the language requires otherwise:
+  typographic quotes (“…”), curly apostrophes (’) and accents absent
+  from the source are normalized (`organization's`, `"technical
+  area"`).
+- Dashes: attribute values and titles use `--`; parenthetical en-dash
+  asides in prose become `-- such as this --`. To preserve a literal
+  double hyphen from the source, insert a zero-width
+  non-joiner entity (`Simulation-&#x200c;-Application`).
+- Names and document-series titles mentioned in forewords are
+  italicized per the source (“ISO _Conformity Assessment_ Committee”,
+  series titles, each “_Part N: …_”).
+- Inline math typed as italics + subscripts (`_θ~1~_`) becomes
+  `stem:[θ_1]`.
+- Unnumbered annex clauses carry `[%unnumbered]`.
 - List punctuation: multi-sentence list items keep their full stops;
   colon-fragment items end with `;`. The style checker reports both.
 - Image dividers (height ≤ 10 px rules) are dropped; content figures
