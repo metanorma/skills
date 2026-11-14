@@ -14,6 +14,8 @@ first things to check when a converted document fails or renders wrong.
 | `table missing leading separator` | content line inside a table without a cell marker | move the line out or give it a cell |
 | `ID … has already been used` | duplicate anchors (inserted terms duplicating converted ones) | one emission path per entry |
 | compile passes with `-t` but fails in CI | the flag masks a missing flavor attribute | compile without `-t` |
+| `Malformed MathML: [plurimath] Failed to parse … type \`asciimath\`` | LaTeX content in a stem paragraph or `[stem]++++` passthrough — the block style selects the parser | `[latexmath]` + `----` blocks for LaTeX, no `\[ \]` delimiters; `[$latexmath]` is a role, not a style |
+| math fails one formula at a time across runs | plurimath aborts on the first unparseable formula; the FATAL list is truncated | convert every formula in one pass; grep the log for "Failed to parse" until zero |
 
 ## Rendering failures
 

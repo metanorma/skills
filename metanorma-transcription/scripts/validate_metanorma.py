@@ -57,6 +57,45 @@ def check_adoc(path):
     check("example fence pairing", not bad_fences,
           f"==== fences not opened by [example] at lines {bad_fences}")
 
+    # math: the block style selects the parser; flag mismatches
+    check("no [$latexmath] role", not re.search(r"^\[\$latexmath\]", text, re.M),
+          "[$latexmath] sets a role, not the block style — use [latexmath]")
+
+    stem_paras = [i + 1 for i, l in enumerate(lines)
+                  if re.match(r"^\\\[($|\s)", l)
+                  or re.match(r"^\\\[.*\\\]$", l.strip())]
+    check("no bare \\[...] stem paragraphs", not stem_paras,
+          f"LaTeX in stem paragraphs parses as asciimath: lines {stem_paras[:6]}")
+
+    latex_cmds = re.compile(r"\\(frac|sqrt|int|exp|sum|prod|left|right|text|mathrm|tag)\b")
+    bad_stem_blocks = []
+    for i, l in enumerate(lines):
+        if l.rstrip() == "[stem]":
+            j = i + 1
+            if j < len(lines) and lines[j].strip() == "++++":
+                k = j + 1
+                while k < len(lines) and lines[k].strip() != "++++":
+                    if latex_cmds.search(lines[k]):
+                        bad_stem_blocks.append(i + 1)
+                        break
+                    k += 1
+    check("no LaTeX inside [stem] passthroughs", not bad_stem_blocks,
+          f"asciimath parser sees LaTeX commands at lines {bad_stem_blocks[:6]}")
+
+    bad_delims = []
+    for i, l in enumerate(lines):
+        if l.rstrip() == "[latexmath]":
+            j = i + 1
+            while j < len(lines) and lines[j].strip() != "----":
+                j += 1
+            j += 1
+            while j < len(lines) and lines[j].strip() != "----":
+                if lines[j].strip().startswith("\\[") or lines[j].strip().endswith("\\]"):
+                    bad_delims.append(j + 1)
+                j += 1
+    check("latexmath blocks free of \\[ \\] delimiters", not bad_delims,
+          f"delimiters are stem-paragraph syntax, not formula content: lines {bad_delims[:6]}")
+
     # annex style and depth
     check("annex style", "[annex]" not in text,
           "use [appendix] — the annex style is unknown to asciidoctor")
