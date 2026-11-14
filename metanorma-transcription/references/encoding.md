@@ -55,6 +55,46 @@ A transcribed document carries, as a minimum:
   cross-references; Metanorma numbers them. Anchor and reference by
   `[[id]]` / `<<id>>`.
 
+## Auto-injected boilerplate
+
+The pipeline generates standard furniture at compile time. Never
+transcribe it, and never "restore" it in review:
+
+- The foreword's numbered items (1) The formal decisions…, 2) They have
+  the form…, 3) In order to promote…) — the IEC flavor ships
+  `boilerplate-en.adoc` / `boilerplate-fr.adoc` and selects by document
+  language.
+- The terms-clause intro ("For the purposes of this document, the
+  following terms and definitions apply." plus the Electropedia /
+  ISO Online Browsing Platform bullets) — isodoc i18n.
+- "There are no normative references in this document." — injected when
+  clause 2 carries no bibitems; the source keeps the (empty) clause.
+- Presentation-time clause titles: an `Abbreviations` subclause
+  compiles to `<definitions type="abbreviated_terms">` with no title
+  element, and normative-references sections compile to `<references>`
+  whose title the renderer generates. Their presence in the compiled
+  XML is the proof of presence; source-side title comparisons must
+  exempt them.
+
+A source-tree review that flags these absences as content loss wastes a
+review cycle every time.
+
+## Bilingual editions
+
+- A source PDF may be bilingual (IEC/EN adoptions frequently carry an
+  English and a French side in one file). Check the OCR text for French
+  before deciding there is no French ground truth — the French side of
+  the same PDF is authoritative for the `fr/` tree.
+- Multilingual trees live side by side:
+  `sources/<family>/<year>/en/…` and `…/fr/…`, file-for-file mirrors.
+  Figures are extracted per language (labels differ between the two
+  sides of the PDF).
+- The `fr` tree keeps the English clause keyword "Normative references"
+  so the flavor's clause detection fires; French display headings use
+  `[heading=…]` attributes where the rendered text must differ.
+- Both trees register in the site manifest; a tree that is not
+  registered will not build or publish.
+
 ## Terms and definitions
 
 The canonical entry form:
@@ -100,8 +140,11 @@ ISO 1087-1, 3.4.1
   (` *[SOURCE: …]*`) parses as block attributes, not text — it
   renders as a phantom empty figure. Citations inside blocks are
   `[.source]`-styled paragraphs.
-- Sources are `[.source]` blocks; the modification text follows the
-  citation (`ISO 10241-1, 3.1.2, modified — …`).
+- Sources are `[.source]` blocks; the citation targets a bibliography
+  anchor (`<<IEC_60050_161_1990,clause=161-01-20>>`) rather than a bare
+  string, and the modification marker is part of the content:
+  `…clause=161-01-20>>, modified — the domain has been deleted…`.
+  Dropping "modified" silently changes a term's normative status.
 
 ### Concept mentions
 

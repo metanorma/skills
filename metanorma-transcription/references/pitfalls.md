@@ -38,6 +38,19 @@ first things to check when a converted document fails or renders wrong.
 
 ## Process failures
 
+- **Flagging injected boilerplate as lost content.** The numbered
+  foreword items, the terms-clause intro, and the "no normative
+  references" sentence are compile-time injections; their absence from
+  sources is the correct state. Reviews and agents must not restore
+  them — each restoration is a wasted review cycle.
+- **Localizing clause keywords.** Renaming "Normative references" to a
+  translated heading in a non-English tree breaks the flavor's clause
+  detection and silently reclassifies the section as informative.
+  Keep the English keyword; localize display with `[heading=…]`.
+- **Taking the edition from the document ID.** The edition comes from
+  the PDF cover and foreword ("This third edition…"), not from the
+  identifier or filename — restructured editions have been encoded with
+  the wrong edition number twice from ID-derived metadata.
 - **Rebuilding from originals loses manual output edits.** Every
   correction goes into the pipeline (the script), then the pipeline reruns
   from the source. A fix applied only to the generated file is lost on
