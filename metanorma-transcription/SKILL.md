@@ -65,6 +65,15 @@ decide success or failure.
 
 ## The rules that decide success
 
+- **Math: the block style selects the parser.** LaTeX formulas go in
+  `[latexmath]` + `----` open blocks with no `\[ \]` delimiters inside.
+  Bare `\[...\]` stem paragraphs and `[stem]++++` passthroughs parse as
+  **asciimath** and fail plurimath with "Failed to parse … type
+  `asciimath`"; `[$latexmath]` is a role, not a style — it does not
+  select the parser. Re-encoding the content as genuine asciimath in a
+  `[stem]` block is equally valid; the parser type must match the
+  content syntax. See `references/encoding.md`.
+
 - **Annexes are `[appendix]`, never `[annex]`.** The unknown `annex`
   style raises "annex sections do not support nested sections". Annexes
   support heading depth 3 and 4 only — convert deeper structures

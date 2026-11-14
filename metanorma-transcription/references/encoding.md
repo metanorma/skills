@@ -122,6 +122,41 @@ related to one concept {{<<term-concept>>,concept}}
   designations are the wholly-bold lines that follow the bold
   term-number line.
 
+## Math
+
+The block style attribute selects which parser (plurimath) sees the
+content — mismatches are the most expensive math failure class because
+they surface only at compile time, after everything else is clean:
+
+```adoc
+[latexmath]
+----
+I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
+----
+```
+
+- LaTeX content MUST use the `[latexmath]` + `----` open-block form,
+  with no `\[ \]` delimiters inside the block. The delimiters are stem
+  -paragraph syntax, not part of the formula.
+- Bare `\[ ... \]` stem paragraphs and `[stem]` / `++++` passthrough
+  blocks containing LaTeX commands parse as **asciimath** and fail with
+  "Malformed MathML: [plurimath] Failed to parse … type `asciimath`".
+- `[$latexmath]` sets a role, not the block style — it does not select
+  the parser. `[latexmath]` (no `$`) does.
+- The reverse direction is legitimate: re-encoding the content as
+  genuine asciimath inside `[stem]` blocks works and matches the
+  corpus-wide default. The requirement is parser-content agreement, not
+  a specific dialect.
+- Formula numbering: give numbered formulas `[[eq-<id>]]` anchors above
+  the block and reference with `<<eq-<id>>>`; do not put `\tag{}` inside
+  the formula body.
+- Only the compile reveals a parser mismatch — there is no reliable
+  source-side static check. Run the compile before declaring math done;
+  grep the log for "Failed to parse".
+- A single failing formula aborts the whole document with FATAL
+  ERRORS listing only the first few failures; convert every formula,
+  not just the ones in the log.
+
 ## Tables
 
 - Normalize rows to the declared `[cols=]` count; a `[cols=",",]`
