@@ -34,6 +34,37 @@ A transcribed document carries, as a minimum:
 - A provenance note goes in an AsciiDoc comment above the title
   (`// …`), not as visible body text.
 
+### Identifiers, editions and URNs
+
+The identifier block comes from the printed cover and the publisher's
+catalogue, and every value is verified against print before encoding:
+
+- The identifier-carrying attributes: `:doctype:`, `:series:`,
+  `:docnumber:` (with the part glued in where the publisher numbers
+  parts), `:edition:`, `:published-date:`, and the language attribute.
+  `:docidentifier:` may be set explicitly where the flavor does not
+  compose it.
+- Doctypes come from the publisher's authoritative catalogue, never
+  from the transcriber's taxonomy — a wrong doctype misroutes every
+  doctype-dependent branch (cover band colors, XSL routing, bibdata).
+  The IALA catalogue, for instance, carries exactly five technical
+  categories, and every registered doctype should be exercised by a
+  real corpus document.
+- `:urn:` is written as a fallback attribute; minting through the
+  publisher's pubid grammar supersedes it wherever a grammar exists.
+- Verify a minted or hand-written URN against the forms printed on the
+  cover and in the page footers. Printed spelling variants (cover
+  `ed.1.0`, footer `Ed1.0`) are recorded verbatim in a source comment
+  as open questions for the publisher — never silently normalized to
+  the corpus convention without a note.
+- Editions are typed values with varying printed forms (`Edition 1.0`,
+  `Ed 1.0`, `4.10.0`). Take the edition from the cover/foreword, not
+  from the identifier, and record the printed form.
+- Do not split `:docnumber:` and `:partnumber:` while the flavor's
+  docidentifier cleanup crashes on the pair (metanorma-iho#577): carry
+  a single glued docnumber (`0103-1`) with a source comment until the
+  flavor is fixed.
+
 ### Site-scale conventions
 
 In a corpus that builds as one site, each document additionally needs:
@@ -74,6 +105,52 @@ In a corpus that builds as one site, each document additionally needs:
   cross-references; Metanorma numbers them. Anchor and reference by
   `[[id]]` / `<<id>>`.
 
+## Verbatim transcription
+
+The transcription records what the edition prints; it does not edit it.
+
+- Printed typos are kept as printed — never repaired while
+  transcribing. An official-text oddity (a missing conjunction, a
+  broken cross-reference, a spaced hyphen) is a fact of the edition;
+  repairs belong to a post-transcription editorial pass that is
+  recorded and attributable.
+- Form variants between print locations are recorded, not reconciled:
+  cover vs footer URNs, recital vs cover titles, running-header vs
+  cover case. Each variant lands verbatim in a source comment as an
+  open question for the publisher.
+- Where the contents page and the body disagree on numbering, the body
+  numbering is encoded and the contents-page variant noted in a
+  comment.
+- Heading case follows the corpus convention (the common one is
+  sentence-cased level-1 clauses with acronyms preserved); where a
+  template renders typed lower case in capitals, the typed case of
+  sub-clauses is kept as printed.
+- Running headers, folios and template artifacts (`gnnnn` placeholder
+  URNs, staged edition lines) are furniture and drop out; real data
+  under them (the actual URN, the actual edition) is front matter.
+
+## Amendment and revision records
+
+Loose-leaf and amended publications carry their update history in
+Record of Updates / Document Revision tables. Encode that history as
+structured data, not as hand-built output:
+
+- Per-section `updates.yaml` in the corpus layout; pending that
+  layout, the table data captured verbatim as comments at the top of
+  `document.adoc`. One record carries: affected unit (anchor),
+  edition or event string, promulgated citation, approved citation
+  (nullable — "t.b.a." is a state), note.
+- Derived Record of Updates pages are generated from these records.
+  A hand-encoded table duplicates work the generator must redo, and
+  the data gates the flavor's revision-page template work even when
+  no template renders it yet.
+- Approval and recital pages (council decisions, adoption resolutions)
+  are captured the same way — they are metadata the flavor's cover and
+  revision templates will consume, not body prose to retype.
+- Amendment rows cite units at sub-clause and lettered-item
+  granularity (`A-202.1d`); compound and range citations are lists of
+  references, not single values.
+
 ## Auto-injected boilerplate
 
 The pipeline generates standard furniture at compile time. Never
@@ -107,7 +184,13 @@ review cycle every time.
 - Multilingual trees live side by side:
   `sources/<family>/<year>/en/…` and `…/fr/…`, file-for-file mirrors.
   Figures are extracted per language (labels differ between the two
-  sides of the PDF).
+  sides of the PDF); in the corpus layout, section-local `images/`
+  directories are shared across variants instead of duplicated.
+- **Language variants carry identical anchors.** The anchor set is
+  frozen on the master language at the anchor freeze; `fr`/`es` files
+  mirror it exactly, and `scripts/anchor-parity` asserts the identity.
+  The numbering system is identical across language editions of a
+  publication — anchors are how a clause is cited across languages.
 - The `fr` tree keeps the English clause keyword "Normative references"
   so the flavor's clause detection fires; French display headings use
   `[heading=…]` attributes where the rendered text must differ.
@@ -231,6 +314,35 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
 - Blank lines inside `|===` regions terminate cells — drop them.
 - Table titles become block captions (`. Table title`) above the table,
   not headings.
+- **Two-level grouped headers do not survive `options="header"`.**
+  Metanorma emits a single-row `<thead>`, and a row-span crossing the
+  thead/tbody boundary fails validation ("rows cannot go outside
+  thead/tbody"). Keep the grouped header rows in tbody with `.2+`
+  row-spans and bold cells; the semantics survive even though the
+  printed two-row header becomes one header row plus a styled row.
+- Span specs and cell markers interact: `.2+|` opens a cell with a
+  row-span, but a span spec following a stray `|` silently creates an
+  empty cell. Re-count cells per row after any span edit.
+- Merged cells, stacked ranges (`+` line breaks inside one cell) and
+  superscript ranges (bit numbers, scale bands) need explicit spans —
+  encode the print's merge structure, not its visual approximation,
+  and verify the rendered table against the print row by row.
+
+## Figures
+
+- Figures and tables are captioned or unnumbered **per the printed
+  document**, even when the flavor numbers them by default. Style
+  warnings about untitled figures reflect Metanorma's default
+  expectation, not the source's practice — leave genuinely unnumbered
+  print figures uncaptioned.
+- Legends and caption boxes are real content (paragraphs, tables), not
+  part of the image — other language editions translate them.
+- Word-sourced figures arrive with the caption paragraph after the
+  image; Metanorma wants `. Caption` above the block. Move it up and
+  strip printed "Figure N" prefixes where the flavor renumbers.
+- Keep original image filenames from the source (Word `word/media`
+  names, PDF object names) unless the corpus convention says otherwise;
+  renumbering images breaks the mapping back to the source.
 
 ## Inline cleanup
 

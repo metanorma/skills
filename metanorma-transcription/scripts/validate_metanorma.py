@@ -33,6 +33,16 @@ def check_adoc(path):
     check("flavor attribute", ":mn-document-class:" in text,
           "missing :mn-document-class: — the compile fails without it")
 
+    # docnumber+partnumber pair trips metanorma-iho docidentifier cleanup
+    # (metanorma-iho#577): carry one glued docnumber until the flavor is fixed
+    flavor_m = re.search(r"^:mn-document-class:\s*(\S+)", text, re.M)
+    flavor = flavor_m.group(1) if flavor_m else ""
+    check("no :partnumber: split on iho-family documents",
+          not (flavor in ("iho", "iala") and re.search(r"^:partnumber:", text, re.M)),
+          ":docnumber: + :partnumber: crashes metanorma-iho docidentifier "
+          "cleanup (metanorma-iho#577) — carry one glued :docnumber: "
+          "with a source comment until the flavor is fixed")
+
     # imagesdir must be absent when body paths already carry images/
     has_imagesdir = bool(re.search(r"^:imagesdir:", text, re.M))
     body_img = bool(re.search(r"^image:?s?images/", text, re.M))
