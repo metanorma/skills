@@ -1,6 +1,6 @@
 ---
 name: metanorma-transcription
-description: Transcribe standards documents (ISO-style PDFs, HTML exports, legacy machine conversions) into publication-grade Metanorma AsciiDoc, and validate the result compiles and renders correctly. Use when converting a standards document to Metanorma, repairing a converted document's structure, encoding terminological entries, or diagnosing why a Metanorma document renders text as source code.
+description: Transcribe standards documents (ISO-style PDFs, HTML exports, legacy machine conversions) into publication-grade Metanorma AsciiDoc, and validate the result compiles and renders correctly. Use when converting a standards document to Metanorma, repairing a converted document's structure, encoding terminological entries, choosing between PDF and HTML extraction, setting up a transcription repository, or diagnosing why a Metanorma document renders text as source code.
 ---
 
 # Transcribing documents into Metanorma
@@ -13,11 +13,17 @@ decide success or failure.
 
 ## The workflow
 
-1. **Intake.** Identify the source: a PDF, an HTML export, or an existing
-   machine conversion (pandoc-class dumps with bookmark cruft, page
-   furniture, pasted covers). Keep the source files untouched and present
-   — they are the source of record. Note the provenance in an AsciiDoc
-   comment above the document title. Never delete a source file.
+1. **Intake.** Identify the source kind: an HTML export (structure-
+   bearing, typography-degraded) or a PDF (typography-authoritative,
+   structure-blind). With both, take the skeleton from the HTML and the
+   truth from the PDF — `references/sources.md` states what each source
+   carries, the extraction tools (`pdftotext -layout`, `pdftohtml -xml`),
+   and the designation-recovery technique. Set up the target layout per
+   `references/structure.md`: one `sources/<doc-slug>/` directory with
+   `document.adoc`, `sections/`, and `images/`; sources of record in
+   `reference-docs/`; the pipeline committed under `tools/`. Keep the
+   source files untouched; the pipeline reruns from them, never from
+   already-transcribed output.
 
 2. **Front matter.** Every document carries the flavor attribute
    (`:mn-document-class:`) — the compile resolves the flavor from it, and
@@ -53,7 +59,9 @@ decide success or failure.
 
 8. **Deliver.** Compile XML and HTML first; produce PDF once the XML and
    HTML checks pass. Re-run the full pipeline from the source on any
-   correction — a fix applied only to the output is lost on the next run.
+   correction — a fix applied only to the output is lost on the next
+   run, and a manual workaround left in place duplicates what the
+   pipeline later converts natively.
 
 ## The rules that decide success
 
@@ -68,8 +76,7 @@ decide success or failure.
 
 - **Fence balance is absolute.** An unpaired `----` turns the rest of the
   document into source code; interleaved example fences trap prose inside
-  blocks. Convert display-box delimiters deliberately (`[example]` +
-  `====` … `====`), and keep body-level examples single-paragraph.
+  blocks; multi-record listings share one fence pair.
 
 - **UML stereotypes use guillemets** («interface», «enumeration»), never
   double angle brackets — `<<interface>>` parses as a cross-reference
@@ -79,6 +86,11 @@ decide success or failure.
   anchor; the validator reports dangling targets. Self-references use
   anchors (`<<scope>>`), never hardcoded clause numbers; only other
   documents' clauses are cited by number.
+
+- **Assert every rewrite.** Count replacements against the expected
+  number; digit-count mistakes (`iso-19\d\d/` against `iso-19104/`) and
+  invisible-detail defeats (trailing spaces, shifted capture groups)
+  are silent no-ops that produce wrong output with no error.
 
 - **Transcribe the whole document.** Every section of the source appears
   in the output — transcribed, or flagged as out of scope before delivery.

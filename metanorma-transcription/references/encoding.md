@@ -91,6 +91,15 @@ ISO 1087-1, 3.4.1
   `[example]` + `====` open block for multi-paragraph ones. Body-level
   `EXAMPLE` lines outside term clauses convert as single-paragraph
   examples only — continuation blocks stay in the text flow.
+- **Multi-record listings share one fence pair.** Listing several YAML
+  records inside one `[source]` block uses a single `----` … `----`;
+  a fence per record closes the block after the first record and the
+  remaining records leak into the page as raw text, while a later
+  stray fence swallows the following section as source code.
+- A line whose first non-space character opens a bracket
+  (` *[SOURCE: …]*`) parses as block attributes, not text — it
+  renders as a phantom empty figure. Citations inside blocks are
+  `[.source]`-styled paragraphs.
 - Sources are `[.source]` blocks; the modification text follows the
   citation (`ISO 10241-1, 3.1.2, modified — …`).
 

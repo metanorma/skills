@@ -88,6 +88,29 @@ def check_adoc(path):
             if re.match(r"^={2,4} \d+(\.\d+)*[ 	]", l)]
     check("no hardcoded heading numbers", not hard, f"{hard[:4]}")
 
+    # bracket-led lines parse as block attributes (phantom figures)
+    phantom = [l.strip()[:40] for l in lines
+               if re.match(r"^\s+[*]?\[.+?\][*]?\s*$", l)]
+    check("no bracket-led lines", not phantom,
+          f"lines starting with '[' parse as attributes: {phantom[:4]}")
+
+    # shifted fences: a ---- closer followed by record content without a
+    # blank line leaks that content into the page as raw text
+    shifted = []
+    for i, l in enumerate(lines):
+        if l.rstrip() == "----":
+            j = i + 1
+            while j < len(lines) and not lines[j].strip():
+                j += 1
+            prev = lines[i - 1].rstrip() if i else ""
+            nxt = lines[j].strip() if j < len(lines) else ""
+            if nxt and not prev.startswith(("[source", "[example")) \
+               and re.match(r"^(id|termid|data|status|terms|definition|"
+                            r"scores|entry|reviewer|date|-)", nxt):
+                shifted.append(i + 1)
+    check("fences not shifted", not shifted,
+          f"---- followed directly by record content at lines {shifted[:4]}")
+
     return text
 
 

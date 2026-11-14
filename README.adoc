@@ -29,14 +29,24 @@ or diagnosing Metanorma rendering failures.
 == What the transcription skill encodes
 
 The skill distills production experience transcribing ISO-published
-documents into Metanorma: flavor attributes and doctype pass-through,
-heading reconstruction from bookmarked tables of contents, `[appendix]`
-annex rules, term-clause encoding with concept mentions
-(`{{<<anchor>>,term}}`), furniture and watermark removal, table
-normalization, and a validation battery
-(`scripts/validate_metanorma.py`) covering fence balance, dangling
-cross-references, prose trapped in source blocks, and term-element
-counts.
+documents into Metanorma:
+
+- *Sources*: what HTML exports carry versus PDFs (structure skeleton
+  versus typographic truth), the extraction tools, and the hybrid
+  workflow that recovers designation lists by font analysis
+  (`references/sources.md`);
+- *Structure*: the target repository layout — `sources/<doc-slug>/`
+  with `document.adoc`, `sections/`, `images/`, sources of record in
+  `reference-docs/`, the pipeline committed under `tools/`, and the
+  build-artifact gitignore (`references/structure.md`);
+- *Encoding*: flavor attributes and doctype pass-through, heading
+  reconstruction from bookmarked tables of contents, `[appendix]`
+  annex rules, term clauses with concept mentions
+  (`{{<<anchor>>,term}}`), furniture removal, table normalization;
+- *Validation*: the battery in `scripts/validate_metanorma.py` —
+  fence balance and shifted fences, dangling cross-references,
+  bracket-led phantom-attribute lines, prose trapped in source
+  blocks, and term-element counts.
 
 == License
 

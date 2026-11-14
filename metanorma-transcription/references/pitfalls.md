@@ -47,6 +47,30 @@ first things to check when a converted document fails or renders wrong.
 - **Regexes that never match.** Digit-count mistakes (`iso-19\d\d/`
   against `iso-19104/`) fail silently — verify each rewrite by counting
   replacements, and assert on the expected count.
+- **Silent no-op matches.** A match condition defeated by an invisible
+  detail — a trailing space from joined lines defeating an
+  `endswith('.')`, a capture index shifting when a helper pattern gains
+  a group — produces wrong output with no error. Print the matched text
+  while developing rules; assert on counters.
+- **Structure edits that eat headings.** Inserting a section before an
+  existing heading and replacing without re-including the heading line
+  deletes it silently — requirement lists lose their parent clause and
+  the next section absorbs them. If an edit's replacement does not end
+  with the heading it precedes, the heading belongs in the replacement.
+- **Two emission paths for one content.** A manual workaround (hand-
+  inserted terms, hand-fixed sections) plus a pipeline that later gains
+  the same capability produce duplicates — duplicate-anchor build
+  failures or repeated content. When the pipeline learns to emit
+  something, delete the workaround in the same change.
+- **Rerunning against already-transcribed output.** The pipeline anchors
+  on the source's cover headings and cruft; running it against HEAD
+  fails outright (its landmarks are gone) or double-applies. Restore
+  the originals from the source of record before every rerun.
+- **Assuming the conversion dropped content.** Before reconstructing
+  "missing" entries, check whether the source carries them behind
+  cruft — wrapped numbering (`[#b12]##‌##4.37[#b13]##‌##…`) hides entries
+  from naive line patterns. Match the cruft, don't re-author from the
+  PDF.
 - **PDF first.** PDF rendering is the slow step; validate XML and HTML
   first, produce PDF last.
 - **Validating with the flag on.** `metanorma compile -t iso` hides a
