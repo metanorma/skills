@@ -137,6 +137,22 @@ def check_adoc(path):
             if re.match(r"^={2,4} \d+(\.\d+)*[ 	]", l)]
     check("no hardcoded heading numbers", not hard, f"{hard[:4]}")
 
+    # hand-written note/example numbers double-number after rendering
+    numbered = [(i + 1, l.strip()[:40]) for i, l in enumerate(lines)
+                if re.match(r"^NOTE \d+[:.]", l)
+                or re.match(r"^EXAMPLE \d+[:.]", l)
+                or re.match(r"^\s*-?\+?Note \d+ to entry[:.]", l)]
+    check("no hand-numbered notes/examples", not numbered,
+          f"auto-numbered content carries manual numbers: {numbered[:4]}")
+
+    # [bibliography] styling is legal only on leaf sections
+    biblio_mid = [i + 1 for i, l in enumerate(lines)
+                  if l.strip() == "[bibliography]"
+                  and any(re.match(r"^== ", x)
+                          for x in lines[i + 1:i + 4])]
+    check("bibliography style on leaf sections only", not biblio_mid,
+          f"[bibliography] heading followed by nested sections at lines {biblio_mid[:6]}")
+
     # bracket-led lines parse as block attributes (phantom figures)
     phantom = [l.strip()[:40] for l in lines
                if re.match(r"^\s+[*]?\[.+?\][*]?\s*$", l)]
