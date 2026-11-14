@@ -37,8 +37,11 @@ A transcribed document carries, as a minimum:
 - Deprecated attributes are removed, not updated: `:data-uri-image:`,
   `:docfile:` are gone from the toolchain.
 - Multi-part documents split the identifier: `:docnumber: 17021` plus
-  `:partnumber: 1`; publication dates are full ISO dates when the
-  source carries the day.
+  `:partnumber: 1` — unless the flavor's docidentifier cleanup crashes
+  on the split (metanorma-iho#577), in which case carry a single glued
+  docnumber (`0103-1`) with a source comment until the flavor is
+  fixed. Publication dates are full ISO dates when the source carries
+  the day.
 - `:library-ics:` is comma-separated (`35.030, 03.040`), never
   semicolon-separated.
 - A non-default foreword (European foreword, national foreword) needs
