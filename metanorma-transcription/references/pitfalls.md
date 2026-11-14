@@ -71,6 +71,18 @@ rounds in one corpus before they were catalogued:
   example block: licence notices and encoding remarks wrapped in them
   render as visible examples and can suppress the heading that
   follows. Meta-notes are `//` comments.
+- **Invented titles for hanging paragraphs.** Converting
+  `[.subclause="X.Y.Z"]` attributes into guessed headings
+  ("Safeguarding impartiality", "Legal entity") fabricated content the
+  edition never printed — 740 such conversions needed the anchor-plus-
+  blank-heading rewrite. Hang paragraphs are `[[scls-X-Y-Z]]` +
+  `==== {blank}`.
+- **Cell-spec order silently malformed.** Alignment before span
+  (`^.2+h|`) parses wrong; `^.^.2+h|` parses not at all. Span first:
+  `.2+^h|`.
+- **`include::` lines butted together.** Consecutive includes without a
+  blank line between them render the second file's content attached to
+  the first's last block.
 - **Hand-written note and example numbers.** `NOTE 1:` and `EXAMPLE 1:`
   prefixes double-number after Metanorma auto-numbers them; strip to
   bare `NOTE:` / `[example]`, and split multi-paragraph notes into

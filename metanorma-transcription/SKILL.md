@@ -90,6 +90,17 @@ decide success or failure.
 
 ## The rules that decide success
 
+- **Amendments encode change structure.** `del:[…]` / `add:[…]`
+  inline macros and `[change=…]` clause attributes — `[strike]#…#`
+  passthroughs are conversion leftovers. See
+  `references/encoding.md`.
+
+- **Concept mentions use the `{{term}}` macro with option control.**
+  Never `<<…>>` for a mention, never manual parentheses or clause
+  numbers; plural and grammatical forms pass through the rendered-text
+  field; vocabulary documents tune `options=` per print (linked in
+  definitions, plain in notes). See `references/encoding.md`.
+
 - **Notes, examples and lists are auto-numbered.** `NOTE 1:` and
   `EXAMPLE 1:` prefixes double-number after rendering; source lettered
   items (`a) b) c)`) become arabic `.` lists. Hand-written numbers and

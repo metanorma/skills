@@ -145,6 +145,23 @@ def check_adoc(path):
     check("no hand-numbered notes/examples", not numbered,
           f"auto-numbered content carries manual numbers: {numbered[:4]}")
 
+    # cell-spec order: span comes before alignment
+    bad_spec = [(i + 1, l.strip()[:50]) for i, l in enumerate(lines)
+                if re.search(r"\^[\d.]+\+?h?\||\^[\d.]+\+\^", l)]
+    check("cell-spec span before alignment", not bad_spec,
+          f"alignment-before-span cell specs parse wrong: {bad_spec[:4]}")
+
+    # [sourcecode] is not a Metanorma style
+    sc = [i + 1 for i, l in enumerate(lines) if "[sourcecode" in l]
+    check("no [sourcecode] style", not sc,
+          f"use [source%unnumbered,lang] — [sourcecode] is unknown: lines {sc[:4]}")
+
+    # adaptation is a block role, not a locality
+    adapted = [l.strip()[:50] for l in lines
+               if re.search(r"<<[^>]*,[Aa]dapted>>", l)]
+    check("adapted as block role", not adapted,
+          f"Adapted belongs on the block ([.source%adapted]), not in the xref: {adapted[:4]}")
+
     # [bibliography] styling is legal only on leaf sections
     biblio_mid = [i + 1 for i, l in enumerate(lines)
                   if l.strip() == "[bibliography]"
