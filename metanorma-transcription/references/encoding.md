@@ -48,8 +48,27 @@ A transcribed document carries, as a minimum:
   `[heading=foreword]` on its heading, or the flavor numbers it as a
   clause.
 - Bare emails become `mailto:addr[]` — the trailing empty `[]` is
-  required. Bare URLs become `link:url[]` (empty text is the settled
-  form).
+  required. Bare URLs become `link:url[]` with the full URL as target
+  and the printed text as display:
+  `link:https://www.iso.org/directives[www.iso.org/directives]`.
+- Committee metadata decomposes: `:technical-committee-type:`,
+  `:technical-committee-number:`, and the name-only
+  `:technical-committee:` — never one combined value.
+- Changing `:mn-document-class:` is a vocabulary remap, not a
+  search-replace: each flavor owns its attribute set (`csd`→`cc`
+  remaps `:technical-committee:`→`:committee:` + `:committee-type:`
+  and `:docstage:`/`:docsubstage:`→`:status:`; IETF validates
+  `:intended-series:` against `informational`/`full-standard`; IHO
+  pubid-parses `:docnumber:`, so display-only strings park in a dummy
+  attribute, e.g. `:docnumberx:`).
+- Illustrative code blocks are `[source%unnumbered,xml]` — the style
+  is `source[,lang]`; `[sourcecode,…]` is not a Metanorma style.
+- A quote attribution containing commas is quoted in the attribute
+  list: `[quote, The Ware Report, "Defense Science Board Task Force on
+  Computer Security, 1970"]`.
+- Edition lineage lives in attributes: `:replaces:` and
+  `:updated-date:`; corrigendum statements ("This corrected version
+  corrects…") are real content, transcribed.
 
 ### Identifiers, editions and URNs
 
@@ -173,6 +192,39 @@ structured data, not as hand-built output:
   granularity (`A-202.1d`); compound and range citations are lists of
   references, not single values.
 
+## Amendment encoding
+
+Amended documents encode the change structure, not strikethrough
+passthroughs:
+
+- Deleted and inserted text uses the `del:[…]` / `add:[…]` inline
+  macros — `[strike]#P#` and `[underline]#IEEE#` are passthrough
+  leftovers, not change markup.
+- Every amended clause carries change attributes on the heading:
+  `[change=modify,locality="clause=4.3"]`; an inserted annex is
+  `[change=add,locality="clause=B",path="."]` plus
+  `[appendix,obligation=informative]`.
+- A replacement figure resumes base-document numbering with
+  `autonumber:figure[N]`, not a manual caption.
+- Flavor-generated front matter is deleted from the source, never
+  transcribed: IEEE supplies "Acknowledgements"/"Word usage" and the
+  amendment editing-instructions note. Participants render from
+  `item::` / `role:::` / `name:::` lines under
+  `== Participants` (with `===` Working Group / Balloting Group /
+  Standards Board groups), not from `{fullname_N}` attributes.
+- IEEE metadata is hyphenated, never underscored: `:docnumber: 987.6`
+  bare (no `P`, ™, or `/D2` — drafts carry `:draft: 2` with
+  `:docstage: draft`), `:society:`/`:committee:`/`:working-group:`/
+  `:balloting-group:`, `:isbn-pdf:` bare, `:updates-document-type:`
+  mirroring the base document's type, and drafts omit
+  `:confirmed-date:` (confirmation is post-approval re-review).
+- Bibliography sections are never anchored — no `[[…]]` on norm-refs
+  or bibliography headings.
+- Table-level options beat per-cell markers:
+  `options="unnumbered,header"` on the table, `h|` only where a table
+  deliberately demonstrates cell-level header marking.
+- Consecutive `include::` lines are separated by blank lines.
+
 ## Cross-references and localities
 
 - Multi-locality references chain full locality tokens with `;and!` /
@@ -249,6 +301,11 @@ review cycle every time.
   `[heading=…]` attributes where the rendered text must differ.
 - Both trees register in the site manifest; a tree that is not
   registered will not build or publish.
+- National-adoption prefaces carry preface roles, not plain headings:
+  `[.preface,type=european-foreword,heading=foreword,keeptitle=true]`
+  on the body, and per-language national forewords as
+  `[.preface,type=national-foreword,language=et,heading=foreword,
+  keeptitle=true]` — each language's foreword in its own section.
 
 ## Terms and definitions
 
@@ -310,14 +367,40 @@ ISO 1087-1, 3.4.1
   entry is year-less).
 - Bibitem list items carry only the `[[[anchor,id]]]` anchor: relaton
   fetches and renders the citation — never append `, _Title_` by hand.
-  Anchor ids follow the corpus convention (e.g. `ISO_IEC_6523_1_2023`;
-  non-ISO entries keep their display id: `W3C did-resolution-1.0`).
+  The display string in the anchor must equal what the fetch returns
+  (`ISO/IEC 15408-1`, not `ISO 15408-1`; `IETF RFC 4949`, not
+  `IETF 4949`) — it overrides the fetched metadata.
+- Anchor ids follow the corpus convention — canonical author-year
+  forms (`CIPM1989`, `Hill2003`), one reference per bibitem,
+  duplicates disambiguated (`Pavese2003a`); non-ISO entries keep their
+  display id (`W3C did-resolution-1.0`).
+- An alternate-name footnote lives inside the cite label:
+  `[[[ref,(ISO/IEC Guide 99:2007 footnote:[Also known as JCGM
+  200])ISO/IEC Guide 99:2007]]]` — not fake superscripts after the
+  entry.
 - Adapted terms from multilingual sources designate per language with
   the `lang:` role, not quoting roles: `=== lang:en[paddy]
   lang:fr[paddy]`.
 - An admitted synonym under the term heading is an `alt:[…]` line as
   the first line of the entry — no blank line between heading and
-  `alt:`.
+  `alt:`; an equally-abbreviation-bearing term uses
+  `preferred:[…]` (`alt:` is only for admitted alternates), and the
+  abbreviation class is metadata inside the term:
+  `[%metadata]` + `abbreviation-type:: initialism`.
+- A terms clause that imports all its terms carries the sources on the
+  heading — `[source=iso17000]` or the multi-source form
+  `[source="ISO_IEC_Guide_99_2007,ISO_IEC_17000_2004"]` — with no
+  transcribed intro; each terms-group heading
+  (`== Terms related to …`) keeps `[heading=terms and definitions]`.
+- Adaptation is marked on the source block, never inside the locality:
+  `[.source%adapted]` + `<<ISO_15026_1>>`, not `<<ISO_15026_1,Adapted>>`.
+- Hanging paragraphs that print as sub-clauses get
+  `[[scls-X-Y-Z]]` + `==== {blank}` at depth (dots + 2) — never
+  `[.subclause="X.Y.Z"]` attributes, never invented titles; the
+  converse holds too: a `{blank}`-headed paragraph-clause that prints a
+  title gets that title restored.
+- Identical stems in definition-list terms derive identical ids — give
+  them explicit distinct anchors.
 
 ### Concept mentions
 
@@ -337,7 +420,16 @@ related to one concept {{<<term-concept>>,concept}}
   `{{process}}`; the clause number is never hand-written —
   `{{proficiency testing item}} (3.8)` drops the `(3.8)`.
 - Plural/inflected forms pass the rendered text:
-  `{{participant,participants}}`, `{{policy, policies}}`.
+  `{{participant,participants}}`, `{{policy, policies}}` — the plural
+  goes inside the braces, never `{{X}}s`.
+- Option control matches the print: `{{term,options="noref,noital"}}`
+  for mentions in note/example prose of vocabulary documents (plain,
+  unlinked), `{{term,options="ref"}}` for the "new terms" foreword list
+  (auto clause number), `{{term,options="noref"}}` with a rendered form
+  for grammatical variants (`{{suspension,suspend,options="noref"}}`,
+  `{{approval,Approval,options="noref"}}`). Do not over-apply
+  `noref` to ordinary standards' mentions, and never use `<<…>>` for a
+  concept mention.
 - The designations of converted entries (preferred vs admitted
   synonyms) can be recovered from the source PDF by font analysis:
   designations are the wholly-bold lines that follow the bold
@@ -368,6 +460,15 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
   genuine asciimath inside `[stem]` blocks works and matches the
   corpus-wide default. The requirement is parser-content agreement, not
   a specific dialect.
+- Asciimath reserves function names — `min` must be written
+  `rm(min)`, and multi-word identifiers are quoted:
+  `"min-entropy" = -log_2 (p)`.
+- Units in math are UnitsML strings, upright and machine-readable:
+  `stem:[0.5 "unitsml(K)"]`, `"unitsml(degC)"` — not `" rm(K)"` or
+  literal `°C`.
+- Titles and attribute values are plain text: a document title carries
+  `0.9 mK`, not `stem:[0.9 "unitsml(mK)"]` (keep the stem form as a
+  trailing comment if it matters).
 - Formula numbering: give numbered formulas `[[eq-<id>]]` anchors above
   the block and reference with `<<eq-<id>>>`; do not put `\tag{}` inside
   the formula body.
@@ -429,6 +530,13 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
 - Keep original image filenames from the source (Word `word/media`
   names, PDF object names) unless the corpus convention says otherwise;
   renumbering images breaks the mapping back to the source.
+- Word-sourced figure keys (shape-glyph legends) are
+  `[%unnumbered,cols="a,a"]` tables with `image::` cells; key entries
+  drop trailing punctuation and match print case.
+- A figure whose asset is not yet extracted gets a `// TODO` comment
+  with the PDF page and OCR bounding box — never a placeholder image.
+- A printed "Source: …" tail inside a figure/table caption moves out of
+  the caption into a `[type="source"]` `[NOTE]` block below.
 
 ## Lists
 
@@ -439,6 +547,12 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
   `. *Term*: definition` with `..` children.
 - Source bullet glyphs (—, •) are list markers, not text: `— EN
   18239…` becomes `* EN 18239…`.
+- A lettered sequence interrupted by prose resumes with `[start=2]`,
+  `[start=4]` — the printed letters are preserved without hand-writing
+  them.
+- Warnings follow the note family: `*WARNING 1* — text` becomes a
+  plain `WARNING:` admonition; no hand-written numbers.
+- An intentionally empty list item is `. {blank}`.
 - Footnote-style citations ("HTTPfootnote:[RFC 7540, …]") become
   bibliography xrefs: a bibitem plus `HTTP <<RFC7540>>`.
 - `****` is an example-block delimiter — text wrapped in it renders as
