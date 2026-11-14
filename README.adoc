@@ -1,0 +1,43 @@
+= Metanorma AI skills
+
+Agent skills for working with Metanorma — packaged as
+https://github.com/anthropics/skills[Agent Skills]: a folder with a
+`SKILL.md` (frontmatter + instructions), reference files, and
+executable helpers, loadable by Claude Code and compatible agents.
+
+== Available skills
+
+[cols="1,2",options="header"]
+|===
+|Skill
+|Purpose
+
+|link:metanorma-transcription/[metanorma-transcription]
+|Transcribe standards documents (PDFs, HTML exports, legacy machine
+conversions) into publication-grade Metanorma AsciiDoc, and validate
+the result compiles and renders correctly.
+|===
+
+== Installing a skill
+
+Copy the skill folder into your agent's skills directory
+(`~/.claude/skills/` for Claude Code), or point your agent at this
+repository. The skill activates when a conversation involves
+converting documents to Metanorma, encoding terminological entries,
+or diagnosing Metanorma rendering failures.
+
+== What the transcription skill encodes
+
+The skill distills production experience transcribing ISO-published
+documents into Metanorma: flavor attributes and doctype pass-through,
+heading reconstruction from bookmarked tables of contents, `[appendix]`
+annex rules, term-clause encoding with concept mentions
+(`{{<<anchor>>,term}}`), furniture and watermark removal, table
+normalization, and a validation battery
+(`scripts/validate_metanorma.py`) covering fence balance, dangling
+cross-references, prose trapped in source blocks, and term-element
+counts.
+
+== License
+
+BSD 2-Clause. See link:LICENSE[].
