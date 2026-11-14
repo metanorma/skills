@@ -16,6 +16,8 @@ first things to check when a converted document fails or renders wrong.
 | compile passes with `-t` but fails in CI | the flag masks a missing flavor attribute | compile without `-t` |
 | `Malformed MathML: [plurimath] Failed to parse … type \`asciimath\`` | LaTeX content in a stem paragraph or `[stem]++++` passthrough — the block style selects the parser | `[latexmath]` + `----` blocks for LaTeX, no `\[ \]` delimiters; `[$latexmath]` is a role, not a style |
 | math fails one formula at a time across runs | plurimath aborts on the first unparseable formula; the FATAL list is truncated | convert every formula in one pass; grep the log for "Failed to parse" until zero |
+| `nil.next=` NoMethodError in docidentifier cleanup | the `:docnumber:` + `:partnumber:` pair hits the flavor's typed-identifier crash (metanorma-iho#577) | carry one glued `:docnumber:` with a source comment until the flavor is fixed |
+| compiles green locally, ancient behavior in CI | stale committed `Gemfile.lock` pins an old toolchain while local builds float forward | refresh and commit the lock with every toolchain change; diff resolved gem versions when local-green/CI-red |
 
 ## Publish failures (site pipeline)
 
@@ -121,3 +123,36 @@ rounds in one corpus before they were catalogued:
 - **Validating with the flag on.** `metanorma compile -t iso` hides a
   missing `:mn-document-class:`; CI compiles without it and fails. Local
   validation must match CI.
+- **Gem shadows behind a stale bundle.** An installed gem or a stale
+  bundle can shadow the code under test: the bundle activates an old
+  core gem over the fixed one, and the symptom reads as an unfixed
+  flavor bug. List activated versions (`gem list`, `bundle list`)
+  before diagnosing, and regression-compile previously-green exemplars
+  after any bundle change.
+- **CI path filters that skip lockfile-only changes.** A workflow
+  triggered on changed paths does not fire for a lockfile-only commit —
+  the render/regression job silently skips. Push an empty commit (or
+  touch a tracked path) to force it.
+- **Trusting an unflattened PDF render.** Transparent backgrounds
+  rasterize black in ImageMagick renders. Flatten alpha to white before
+  any visual comparison or palette claim; a black render is a
+  rasterizer artifact, not evidence about the document.
+- **Typed-value assumptions.** Edition, date, URN and title forms vary
+  per printing (`Edition 1.0` / `Ed1.0` / `ed.1.0`; cover vs footer).
+  Assuming one canonical form normalizes away the publisher's own
+  spellings — record printed variants verbatim as open questions,
+  never silently.
+- **Inventing doctypes from document shape.** A category guessed from
+  what the document looks like misroutes cover bands, XSL routing and
+  bibdata. Verify against the publisher's authoritative catalogue
+  first (the IALA catalogue carries exactly five technical categories);
+  where no exemplar exists for a registered doctype, request one
+  before encoding.
+- **Repairing print errors while transcribing.** Editorial repairs get
+  lost on the next pipeline rerun and are indistinguishable from
+  transcription defects in review. Keep the printed text verbatim;
+  record the oddity in a source comment as an open question.
+- **Reading fleet CI as the gate.** Fleet CI may be red for unrelated
+  in-flight fixes. Local `metanorma compile -x html` green is the
+  gate; report which local gates passed and which workflow is red,
+  never a bare color.
