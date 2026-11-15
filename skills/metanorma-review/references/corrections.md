@@ -7,7 +7,7 @@ How corrections are applied and how PRs land.
 - Fix-ups go on the PR branch: rebase the branch locally, apply the
   fix, push with `--force-with-lease`. CI re-runs on the fresh push.
 - One logical fix per commit; commit messages state the correction in
-  the imperative ("Restore source symbols: p in Rompe-Weizel law").
+  the imperative ("Restore the printed symbol in the discharge-resistance formula").
   No attribution trailers, no generated-by footers.
 - Stage by explicit path only; verify the staged set before
   committing.
