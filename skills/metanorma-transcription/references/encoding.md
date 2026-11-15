@@ -101,6 +101,11 @@ catalogue, and every value is verified against print before encoding:
   a single glued docnumber (`0103-1`) with a source comment until the
   flavor is fixed.
 
+Per-flavor document practices and object-type practices (number
+encoding, bibliographies, section splitting, units and math) are
+catalogued in `references/flavors.md` — one section per flavor,
+updated whenever a flavor joins a corpus.
+
 ### Site-scale conventions
 
 In a corpus that builds as one site, manifest registration, directory
@@ -534,8 +539,8 @@ I(t) = \frac{I_1}{k_1} \times \exp\left(\frac{-t}{\tau_2}\right)
   are dedented (flush with the item text).
 - Sub-items nest with `..`; an intro item with a bold lead becomes
   `. *Term*: definition` with `..` children.
-- Source bullet glyphs (—, •) are list markers, not text: `— EN
-  18239…` becomes `* EN 18239…`.
+- Source bullet glyphs (—, •) are list markers, not text: `— Spec
+  123…` becomes `* Spec 123…`.
 - A lettered sequence interrupted by prose resumes with `[start=2]`,
   `[start=4]` — the printed letters are preserved without hand-writing
   them.

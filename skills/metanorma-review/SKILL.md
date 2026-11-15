@@ -55,12 +55,13 @@ decide success or failure.
   the source, it is a regression regardless of how plausible it reads.
   Watch the meaning-change classes: modal verbs (shall/should/may),
   numeric values and units, table rows, deleted clauses, added
-  sentences absent from the source (fabrications — one encode carried
-  a "6 dB below" requirement the standard never printed).
+  sentences absent from the source (fabrications — an encode once
+  carried a requirement sentence the printed standard never
+  contained).
 
-- **Faithful oddities are not findings.** Printed typos ("Oszillatory",
-  "example or pre-conditioning", "CEI 600050-311") transcribed
-  verbatim are correct. A "typo introduced" flag against a source-
+- **Faithful oddities are not findings.** Printed typos — a
+  misspelled term, a wrong identifier digit, an odd construction —
+  transcribed verbatim are correct. A "typo introduced" flag against a source-
   faithful encode is a review error.
 
 - **Content coverage is a gain when it grows.** A review pass that adds
