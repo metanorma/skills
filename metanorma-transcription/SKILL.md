@@ -199,3 +199,10 @@ decide success or failure.
   in the output — transcribed, or flagged as out of scope before delivery.
   Unnumbered sections (forewords, appreciations, display boxes) are not
   optional.
+
+## Related skills
+
+- **metanorma-review** — editorial review and correction of existing
+  transcriptions, ground-truth verification, merge verdicts.
+- **metanorma-corpus** — multi-document site repositories: manifest,
+  layout, artifact policy, the STS publish pipeline.
