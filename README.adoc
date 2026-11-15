@@ -12,11 +12,48 @@ executable helpers, loadable by Claude Code and compatible agents.
 |Skill
 |Purpose
 
-|link:metanorma-transcription/[metanorma-transcription]
+|link:skills/metanorma-transcription/[metanorma-transcription]
 |Transcribe standards documents (PDFs, HTML exports, legacy machine
 conversions) into publication-grade Metanorma AsciiDoc, and validate
 the result compiles and renders correctly.
+
+|link:skills/metanorma-review/[metanorma-review]
+|Editorially review and correct existing Metanorma encodes against
+their source of record (PDFs, OCR, HTML): verification battery,
+correction conventions, merge verdicts.
+
+|link:skills/metanorma-corpus/[metanorma-corpus]
+|Manage multi-document Metanorma site repositories: the collection
+manifest, per-edition directory layout, artifact hygiene, and the
+site build/publish pipeline with its STS gate.
 |===
+
+== Installing
+
+Three ways, from most automatic to most manual:
+
+. **Plugin marketplace (Claude Code)** —
+
+[source,sh]
+----
+/plugin marketplace add metanorma/skills
+/plugin install metanorma
+----
+
+All three skills load and activate by trigger.
+
+. **Cross-agent installer** (Claude Code, Codex, Cursor, Copilot — the
+open Agent Skills standard) —
+
+[source,sh]
+----
+npx skills add metanorma/skills
+----
+
+. **Manual** — copy any skill folder into the agent's skills directory
+(`~/.claude/skills/` for Claude Code personal skills,
+`.claude/skills/` in a project). The skill activates when the
+conversation matches its trigger phrases.
 
 == Installing a skill
 

@@ -1,0 +1,15 @@
+{
+  "name": "metanorma",
+  "owner": {
+    "name": "Metanorma",
+    "url": "https://metanorma.org"
+  },
+  "plugins": [
+    {
+      "name": "metanorma",
+      "description": "Metanorma skills: transcribe standards documents into Metanorma AsciiDoc, review and correct existing encodes against their sources, and manage multi-document corpus repositories.",
+      "version": "1.0.0",
+      "source": "./"
+    }
+  ]
+}
