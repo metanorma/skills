@@ -26,6 +26,11 @@ correction conventions, merge verdicts.
 |Manage multi-document Metanorma site repositories: the collection
 manifest, per-edition directory layout, artifact hygiene, and the
 site build/publish pipeline with its STS gate.
+|link:skills/metanorma-ballot-dispositions/[metanorma-ballot-dispositions]
+|Manage ISO ballot and systematic-review comment dispositions end to
+end: import comment sheets to canonical Commenter YAML, post one issue
+per comment, drive one-commit-per-comment dispositions, retrieve
+observations, and generate the disposition sheets (OSD and Git lanes).
 |===
 
 == Installing
