@@ -41,7 +41,18 @@ gem, a benchmark you ran. Research first, write second.
    (validation catalogs, flavor topic pages), verifying pages return
    200 before citing them. A channel or a documented feature missing
    from the post is a missed release item.
-6. **Benchmark any performance claim in the released container.** Run
+6. **Pitfalls that already cost a cycle (check before debugging a channel).**
+   - raw.githubusercontent CDN cache: a freshly registered registry
+     entry (tebako-packages feedstock) can serve the stale copy to
+     consumers for a while. If sync-payload says "registry has no
+     version X" right after a registration, re-check raw with a
+     cache-busting param before debugging the flow.
+   - Transient runner windows: several packed legs (fontist OOM kill,
+     toolchain pin mismatches, validate/smoke errors) can fail
+     simultaneously during a GitHub incident window while the identical
+     matrix was green on an earlier build. Rerun failed legs once and
+     compare against the same matrix before root-causing.
+7. **Benchmark any performance claim in the released container.** Run
    the measurement yourself against a real Metanorma document of the
    relevant size, report the method (parse + walk + serialize round
    trip, iterations, container), and never publish an unbenchmarked
