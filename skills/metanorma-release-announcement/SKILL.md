@@ -32,7 +32,16 @@ gem, a benchmark you ran. Research first, write second.
    canon, emfsvg, vectory, omml, fontisan, metanorma-mirror,
    metanorma-release, lutaml-*) or third-party. Our gems get the
    narrative; third-party bumps get the changelog line.
-5. **Benchmark any performance claim in the released container.** Run
+5. **Enumerate the distribution channels and the documentation surface.**
+   The gemfile ledger is one channel only. Check, per release:
+   `metanorma/versions` `data/` for binary, homebrew, snap and
+   chocolatey manifests; the packed distribution release stream
+   (metanorma/packed-metanorma releases, the tebako payloads); and the
+   live metanorma.org documentation for shipped feature areas
+   (validation catalogs, flavor topic pages), verifying pages return
+   200 before citing them. A channel or a documented feature missing
+   from the post is a missed release item.
+6. **Benchmark any performance claim in the released container.** Run
    the measurement yourself against a real Metanorma document of the
    relevant size, report the method (parse + walk + serialize round
    trip, iterations, container), and never publish an unbenchmarked
